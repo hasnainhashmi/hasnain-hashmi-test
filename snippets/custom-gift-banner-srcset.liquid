@@ -1,0 +1,42 @@
+{%- comment -%}
+  Builds a srcset string for an image.
+
+  Candidate widths wider than the source are skipped so Shopify is never
+  asked to upscale, and the source's own width is always appended as the
+  final candidate — so even a small upload still produces a valid srcset.
+
+  Accepts:
+  - image:  {Object} an image_picker / image drop
+  - widths: {String} comma separated candidate widths
+
+  Usage:
+  {%- capture srcset -%}
+    {%- render 'custom-gift-banner-srcset', image: hero_image, widths: '640,960,1280' -%}
+  {%- endcapture -%}
+{%- endcomment -%}
+
+{%- liquid
+  assign native_width = image.width
+
+  # image_url caps out at 5760px
+  if native_width > 5760
+    assign native_width = 5760
+  endif
+
+  assign candidates = widths | split: ','
+  assign srcset = ''
+
+  for candidate in candidates
+    assign candidate_width = candidate | plus: 0
+
+    if candidate_width < native_width
+      assign candidate_url = image | image_url: width: candidate_width
+      assign srcset = srcset | append: candidate_url | append: ' ' | append: candidate_width | append: 'w, '
+    endif
+  endfor
+
+  assign native_url = image | image_url: width: native_width
+  assign srcset = srcset | append: native_url | append: ' ' | append: native_width | append: 'w'
+
+  echo srcset
+-%}

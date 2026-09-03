@@ -1,207 +1,324 @@
 /* =========================================================
    Custom Gift Banner
+   ---------------------------------------------------------
+   Self-contained section styles. Nothing here depends on the
+   theme's own CSS, custom properties or components.
    ========================================================= */
 
 .custom-gift-banner {
+  /* Palette */
+  --cgb-bar-bg: rgba(245, 245, 245, 1);
+  --cgb-accent: rgba(255, 245, 68, 1);
+  --cgb-ink: #000;
+  --cgb-surface: #fff;
+
+  /* Type */
+  --cgb-font-sans: "Jost", "Century Gothic", Futura, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cgb-font-serif: "Lustria", Georgia, "Times New Roman", serif;
+
+  /* Rhythm */
+  --cgb-gutter: 48px;
+  --cgb-hero-gutter: 64px;
+
+  /* Motion */
+  --cgb-duration: 350ms;
+  --cgb-ease: cubic-bezier(0.33, 0, 0.2, 1);
+
+  /* Softens the artwork behind the hero copy. Set to 0 to remove. */
+  --cgb-scrim-opacity: 1;
+
   width: 100%;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+
+  background-color: var(--cgb-surface);
+  color: var(--cgb-ink);
+
+  font-family: var(--cgb-font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Make box sizing predictable for everything inside */
 .custom-gift-banner *,
 .custom-gift-banner *::before,
 .custom-gift-banner *::after {
   box-sizing: border-box;
 }
 
-
 /* =========================================================
-   Top Bar
+   Top bar
    ========================================================= */
 
 .custom-gift-banner__top {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
+  gap: 24px;
 
-  width: 100%;
-  min-height: 72px;
+  min-height: 60px;
+  padding: 8px var(--cgb-gutter);
 
-  padding: 0 40px;
-
-  background-color: #f4c7a1;
+  background-color: var(--cgb-bar-bg);
 }
-
-
-/* Logo - left */
 
 .custom-gift-banner__logo {
-  justify-self: start;
+  flex: 0 0 auto;
 
-  font-size: 18px;
-  font-weight: 700;
+  margin: 0;
+
+  font-size: 24px;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-
-/* Center message */
-
+/* Centred in the space left between the logo and the button,
+   which is how the mockup measures out -- not centred on the
+   viewport. */
 .custom-gift-banner__top-message {
-  justify-self: center;
+  flex: 1 1 auto;
+  min-width: 0;
 
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.4;
-
   text-align: center;
 }
 
+/* =========================================================
+   Buttons
 
-/* Top button - right */
+   Shared shell for both CTAs. The colour wipe lives on a
+   ::before layer that scales in from the left while fading in,
+   and unwinds to the right on the way back out.
+   ========================================================= */
 
-.custom-gift-banner__top-button {
-  justify-self: end;
+.custom-gift-banner__button {
+  position: relative;
+  isolation: isolate;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 24px;
 
-  min-width: 150px;
-  min-height: 44px;
+  padding: 12px 20px;
+  border: 0;
 
-  padding: 10px 20px;
-
-  background-color: #000;
-  color: #fff;
-
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
   text-decoration: none;
+  cursor: pointer;
+
+  /* Figma spec */
+  font-family: var(--cgb-font-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20.48px;
+  letter-spacing: 0;
+  text-align: center;
   text-transform: uppercase;
 
+  transition: color var(--cgb-duration) var(--cgb-ease);
+}
+
+.custom-gift-banner__button::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  transform: scaleX(0);
+  transform-origin: right center;
+  opacity: 0;
+
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+    transform var(--cgb-duration) var(--cgb-ease),
+    opacity var(--cgb-duration) var(--cgb-ease);
 }
 
-.custom-gift-banner__top-button span {
-  font-size: 18px;
-  line-height: 1;
+.custom-gift-banner__button:hover::before,
+.custom-gift-banner__button:focus-visible::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+  opacity: 1;
 }
 
-.custom-gift-banner__top-button:hover {
-  background-color: #222;
-  color: #fff;
+.custom-gift-banner__button-label {
+  display: block;
 }
 
+/* The arrow is filled with currentColor, so it flips with the
+   label on hover for free. */
+.custom-gift-banner__button-icon {
+  flex: 0 0 auto;
+  display: block;
+
+  color: inherit;
+}
+
+.custom-gift-banner__button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* --- Top bar CTA: yellow -> black ----------------------- */
+
+.custom-gift-banner__top-button {
+  flex: 0 0 auto;
+
+  min-width: 194px;
+  min-height: 44px;
+
+  /* Holds the CTA against the right edge if the centre message is empty. */
+  margin-inline-start: auto;
+
+  background-color: var(--cgb-accent);
+  color: var(--cgb-ink);
+}
+
+.custom-gift-banner__top-button::before {
+  background-color: var(--cgb-ink);
+}
+
+.custom-gift-banner__top-button:hover,
+.custom-gift-banner__top-button:focus-visible {
+  color: var(--cgb-surface);
+}
+
+/* --- Hero CTA: black -> yellow -------------------------- */
+
+.custom-gift-banner__hero-button {
+  min-width: 206px;
+  min-height: 46px;
+  padding: 13px 24px;
+  gap: 28px;
+
+  background-color: var(--cgb-ink);
+  color: var(--cgb-surface);
+}
+
+.custom-gift-banner__hero-button::before {
+  background-color: var(--cgb-accent);
+}
+
+.custom-gift-banner__hero-button:hover,
+.custom-gift-banner__hero-button:focus-visible {
+  color: var(--cgb-ink);
+}
 
 /* =========================================================
    Hero
+
+   One grid, three children. On desktop the artwork is taken
+   out of flow so it can bleed edge to edge, while the copy and
+   the CTA stack against the bottom-left of the padding box.
+   On mobile those same three children re-flow: copy on white,
+   then the artwork with the CTA sharing its cell.
    ========================================================= */
 
 .custom-gift-banner__hero {
   position: relative;
+  isolation: isolate;
 
-  display: flex;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr auto auto;
+  row-gap: 44px;
+
+  min-height: clamp(520px, 55vw, 730px);
+  padding: var(--cgb-hero-gutter) var(--cgb-hero-gutter) 50px;
+
+  background-color: var(--cgb-surface);
+}
+
+/* Artwork layer */
+.custom-gift-banner__hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  overflow: hidden;
+}
+
+.custom-gift-banner__hero-media picture,
+.custom-gift-banner__hero-media img {
+  display: block;
 
   width: 100%;
-  min-height: 650px;
-
-  padding: 60px 60px;
-
-  background-color: #ddd;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  height: 100%;
 }
 
-
-/* Hero content */
-
-.custom-gift-banner__hero-content {
-  max-width: 560px;
-
-  color: #fff;
+.custom-gift-banner__hero-media img {
+  object-fit: cover;
+  object-position: center;
 }
 
+/* Keeps the copy readable wherever the artwork happens to crop
+   to. Invisible over the white of the illustration itself. */
+.custom-gift-banner__hero::after {
+  content: "";
 
-/* Hero heading */
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 
-.custom-gift-banner__hero-content h1 {
-  margin: 0 0 18px;
+  background: radial-gradient(
+    120% 95% at 0% 100%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.82) 38%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  opacity: var(--cgb-scrim-opacity);
 
-  font-size: clamp(48px, 6vw, 88px);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
+  pointer-events: none;
 }
 
+.custom-gift-banner__hero-copy {
+  position: relative;
+  z-index: 2;
 
-/* Hero description */
+  grid-row: 2;
+  grid-column: 1;
 
-.custom-gift-banner__description {
-  max-width: 460px;
-
-  margin-bottom: 28px;
-
-  font-size: 17px;
-  line-height: 1.5;
+  max-width: 470px;
 }
-
-
-/* Remove default paragraph spacing from rich text */
-
-.custom-gift-banner__description p {
-  margin: 0;
-}
-
-
-/* Hero button */
 
 .custom-gift-banner__hero-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
+  position: relative;
+  z-index: 2;
 
-  min-width: 170px;
-  min-height: 50px;
+  grid-row: 3;
+  grid-column: 1;
 
-  padding: 12px 24px;
+  justify-self: start;
+}
 
-  background-color: #fff;
-  color: #000;
+.custom-gift-banner__heading {
+  margin: 0 0 34px;
 
-  font-size: 13px;
-  font-weight: 600;
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 500;
   line-height: 1;
-  text-decoration: none;
-  text-transform: uppercase;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
-.custom-gift-banner__hero-button span {
-  font-size: 20px;
-  line-height: 1;
+.custom-gift-banner__description {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
 }
 
-.custom-gift-banner__hero-button:hover {
-  background-color: #000;
-  color: #fff;
+.custom-gift-banner__description > :first-child {
+  margin-top: 0;
 }
 
+.custom-gift-banner__description > :last-child {
+  margin-bottom: 0;
+}
 
 /* =========================================================
-   Bottom Bar
+   Bottom bar
    ========================================================= */
 
 .custom-gift-banner__bottom {
@@ -209,136 +326,147 @@
   align-items: center;
   justify-content: center;
 
-  width: 100%;
-  min-height: 64px;
+  min-height: 30px;
+  padding: 7px var(--cgb-gutter);
 
-  padding: 15px 30px;
+  background-color: var(--cgb-bar-bg);
 
-  background-color: #f4c7a1;
-
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
   text-align: center;
+  text-transform: uppercase;
 }
-
 
 /* =========================================================
    Tablet
    ========================================================= */
 
-@media screen and (max-width: 749px) {
+@media screen and (max-width: 989px) {
+  .custom-gift-banner {
+    --cgb-gutter: 32px;
+    --cgb-hero-gutter: 40px;
+  }
 
-  .custom-gift-banner__top {
-    grid-template-columns: 1fr auto;
-
-    min-height: 64px;
-
-    padding: 0 20px;
+  .custom-gift-banner__logo {
+    font-size: 20px;
   }
 
   .custom-gift-banner__top-message {
+    font-size: 15px;
+  }
+
+  .custom-gift-banner__top-button {
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   Mobile
+
+   Copy moves above the artwork on white, and the CTA sits
+   centred over the artwork.
+   ========================================================= */
+
+@media screen and (max-width: 749px) {
+  .custom-gift-banner {
+    --cgb-gutter: 20px;
+  }
+
+  /* Top bar carries the logo only, per the mobile mockup. */
+  .custom-gift-banner__top-message,
+  .custom-gift-banner__top-button {
     display: none;
   }
 
   .custom-gift-banner__logo {
-    font-size: 16px;
-  }
+    flex: 1 1 auto;
 
-  .custom-gift-banner__top-button {
-    min-width: 130px;
-    min-height: 40px;
-
-    padding: 8px 16px;
-
-    font-size: 11px;
+    font-size: 22px;
+    text-align: center;
   }
 
   .custom-gift-banner__hero {
-    min-height: 600px;
+    grid-template-rows: auto auto;
+    row-gap: 0;
 
-    padding: 40px 25px;
+    min-height: 0;
+    padding: 0;
   }
 
-  .custom-gift-banner__hero-content {
-    max-width: 90%;
+  /* Without a dedicated mobile image this band is a 3:2 centre crop of
+     the desktop artwork. */
+  .custom-gift-banner__hero-media {
+    position: static;
+
+    grid-row: 2;
+    grid-column: 1;
+
+    aspect-ratio: 3 / 2;
   }
 
-  .custom-gift-banner__hero-content h1 {
-    font-size: clamp(42px, 11vw, 64px);
+  /* With one, the upload is already cropped for portrait, so show it whole. */
+  .custom-gift-banner__hero-media--has-mobile {
+    aspect-ratio: auto;
+  }
+
+  .custom-gift-banner__hero-media--has-mobile img {
+    height: auto;
+  }
+
+  .custom-gift-banner__hero::after {
+    content: none;
+  }
+
+  .custom-gift-banner__hero-copy {
+    grid-row: 1;
+    grid-column: 1;
+
+    max-width: 34ch;
+    margin-inline: auto;
+    padding: 40px 20px 32px;
+
+    text-align: center;
+  }
+
+  .custom-gift-banner__heading {
+    margin-bottom: 16px;
+
+    font-size: clamp(30px, 8.5vw, 40px);
   }
 
   .custom-gift-banner__description {
     font-size: 15px;
+    line-height: 24px;
+  }
+
+  /* Shares the artwork's grid cell so it overlays it. */
+  .custom-gift-banner__hero-button {
+    grid-row: 2;
+    grid-column: 1;
+
+    place-self: center;
+
+    min-width: 190px;
+    min-height: 44px;
   }
 
   .custom-gift-banner__bottom {
-    min-height: 60px;
+    min-height: 40px;
+    padding: 10px 20px;
 
-    padding: 14px 20px;
-
-    font-size: 11px;
+    font-size: 13px;
   }
 }
 
-
 /* =========================================================
-   Mobile
+   Reduced motion
    ========================================================= */
 
-@media screen and (max-width: 480px) {
-
-  .custom-gift-banner__top {
-    padding: 0 15px;
-  }
-
-  .custom-gift-banner__logo {
-    font-size: 14px;
-  }
-
-  .custom-gift-banner__top-button {
-    min-width: auto;
-
-    padding: 8px 12px;
-  }
-
-  .custom-gift-banner__top-button span {
-    font-size: 15px;
-  }
-
-  .custom-gift-banner__hero {
-    min-height: 550px;
-
-    padding: 30px 20px;
-  }
-
-  .custom-gift-banner__hero-content {
-    max-width: 100%;
-  }
-
-  .custom-gift-banner__hero-content h1 {
-    margin-bottom: 14px;
-
-    font-size: clamp(38px, 12vw, 52px);
-  }
-
-  .custom-gift-banner__description {
-    margin-bottom: 22px;
-
-    font-size: 14px;
-  }
-
-  .custom-gift-banner__hero-button {
-    min-height: 46px;
-  }
-
-  .custom-gift-banner__bottom {
-    min-height: 56px;
-
-    padding: 12px 15px;
-
-    font-size: 10px;
+@media (prefers-reduced-motion: reduce) {
+  .custom-gift-banner__button,
+  .custom-gift-banner__button::before {
+    transition-duration: 1ms;
   }
 }

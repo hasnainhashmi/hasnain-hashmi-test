@@ -1,71 +1,159 @@
 {{ 'custom-gift-banner.css' | asset_url | stylesheet_tag }}
 
+{%- comment -%}
+  Brand webfonts, self-hosted from /assets so there is no third-party
+  request. Drop `jost-variable.woff2` and `lustria-regular.woff2` into
+  the assets folder and these resolve; until then the fallback stacks
+  declared in custom-gift-banner.css take over.
+
+  Move this block to layout/theme.liquid if the fonts are ever needed
+  outside this section.
+{%- endcomment -%}
+{% style %}
+  @font-face {
+    font-family: "Jost";
+    src: url("{{ 'jost-variable.woff2' | asset_url }}") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Lustria";
+    src: url("{{ 'lustria-regular.woff2' | asset_url }}") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+{% endstyle %}
+
+{%- comment -%} Captured once, rendered in both CTAs. {%- endcomment -%}
+{%- capture arrow_icon -%}
+  <svg
+    class="custom-gift-banner__button-icon"
+    xmlns="http://www.w3.org/2000/svg"
+    width="26"
+    height="12"
+    viewBox="0 0 26 12"
+    fill="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      d="M0.75 4.77298L7.37629e-08 4.77298L-7.37629e-08 6.27298L0.75 6.27298L0.75 4.77298ZM25.2803 6.05331C25.5732 5.76042 25.5732 5.28554 25.2803 4.99265L20.5074 0.21968C20.2145 -0.073213 19.7396 -0.0732131 19.4467 0.21968C19.1538 0.512574 19.1538 0.987447 19.4467 1.28034L23.6893 5.52298L19.4467 9.76562C19.1538 10.0585 19.1538 10.5334 19.4467 10.8263C19.7396 11.1192 20.2145 11.1192 20.5074 10.8263L25.2803 6.05331ZM0.75 6.27298L24.75 6.27298L24.75 4.77298L0.75 4.77298L0.75 6.27298Z"
+      fill="currentColor"
+    />
+  </svg>
+{%- endcapture -%}
+
 <section class="custom-gift-banner">
-    {% comment %} top bar START {% endcomment %}
-    <div class="custom-gift-banner__top">
-        <div class="custom-gift-banner__logo">
-            {{ section.settings.logo_text | escape }}
-        </div>    
-        <div class="custom-gift-banner__top-message">
-            {{ section.settings.top_message | escape }}
-        </div>
-        {% if section.settings.top_button_label != blank %}
-            <a 
-                href="{{ section.settings.top_button_link }}"
-                class="custom-gift-banner__top-button"
+  {%- comment -%} Top bar {%- endcomment -%}
+  <div class="custom-gift-banner__top">
+    {%- if section.settings.logo_text != blank -%}
+      <p class="custom-gift-banner__logo">{{ section.settings.logo_text | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.top_message != blank -%}
+      <p class="custom-gift-banner__top-message">{{ section.settings.top_message | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.top_button_label != blank -%}
+      <a
+        class="custom-gift-banner__button custom-gift-banner__top-button"
+        href="{{ section.settings.top_button_link | default: '#' }}"
+      >
+        <span class="custom-gift-banner__button-label">
+          {{- section.settings.top_button_label | escape -}}
+        </span>
+        {{ arrow_icon }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Hero {%- endcomment -%}
+  <div class="custom-gift-banner__hero">
+    {%- liquid
+      assign hero_image = section.settings.hero_image
+      assign hero_image_mobile = section.settings.hero_image_mobile
+
+      # Either picker is enough on its own; whichever is missing falls back
+      # to the other, so the section never renders a broken media layer.
+      assign hero_image_desktop = hero_image | default: hero_image_mobile
+    -%}
+
+    {%- if hero_image_desktop != blank -%}
+      {%- capture hero_srcset -%}
+        {%- render 'custom-gift-banner-srcset',
+          image: hero_image_desktop,
+          widths: '640,960,1280,1600,2000,2400,3000'
+        -%}
+      {%- endcapture -%}
+
+      <div class="custom-gift-banner__hero-media{% if hero_image_mobile != blank %} custom-gift-banner__hero-media--has-mobile{% endif %}">
+        <picture>
+          {%- if hero_image_mobile != blank -%}
+            {%- capture hero_mobile_srcset -%}
+              {%- render 'custom-gift-banner-srcset',
+                image: hero_image_mobile,
+                widths: '480,640,768,960,1280'
+              -%}
+            {%- endcapture -%}
+
+            <source
+              media="(max-width: 749px)"
+              srcset="{{ hero_mobile_srcset }}"
+              sizes="100vw"
+              width="{{ hero_image_mobile.width }}"
+              height="{{ hero_image_mobile.height }}"
             >
-                {{ section.settings.top_button_label }}
-                <span>-></span>
-            </a>
-        {% endif %}    
-    </div>
-    {% comment %} top bar END {% endcomment %}
+          {%- endif -%}
 
-    {% comment %} Hero START {% endcomment %}
-    <div 
-        class="custom-gift-banner__hero"
-        {% if section.settings.hero_image != blank %}
-        style="background-image: url('{{ section.settings.hero_image | image_url: width: 1200 }}')"  
-        {% endif %}  
-    >
-    
-        <div class="custom-gift-banner__hero-content">
+          <img
+            src="{{ hero_image_desktop | image_url: width: 1600 }}"
+            srcset="{{ hero_srcset }}"
+            sizes="100vw"
+            width="{{ hero_image_desktop.width }}"
+            height="{{ hero_image_desktop.height }}"
+            alt="{{ hero_image_desktop.alt | escape }}"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </picture>
+      </div>
+    {%- endif -%}
 
-            {% if section.settings.hero_heading != blank %}
-                <h1>
-                    {{ section.settings.hero_heading }}
-                </h1> 
-            {% endif %}
+    <div class="custom-gift-banner__hero-copy">
+      {%- if section.settings.hero_heading != blank -%}
+        <h1 class="custom-gift-banner__heading">{{ section.settings.hero_heading | escape }}</h1>
+      {%- endif -%}
 
-            {% if section.settings.hero_description != blank %}
-                <div class="custom-gift-banner__description">
-                {{ section.settings.hero_description }}
-                </div>
-            {% endif %}
-
-            {% if section.settings.hero_button_label != blank %}
-                <a
-                href="{{ section.settings.hero_button_link }}"
-                class="custom-gift-banner__hero-button"
-                >
-                {{ section.settings.hero_button_label | escape }}
-                <span aria-hidden="true">→</span>
-                </a>
-            {% endif %}
-
+      {%- if section.settings.hero_description != blank -%}
+        <div class="custom-gift-banner__description">
+          {{ section.settings.hero_description }}
         </div>
+      {%- endif -%}
     </div>
-    {% comment %} Hero END {% endcomment %}
 
-    {% comment %} Bottom bar START {% endcomment %}
+    {%- if section.settings.hero_button_label != blank -%}
+      <a
+        class="custom-gift-banner__button custom-gift-banner__hero-button"
+        href="{{ section.settings.hero_button_link | default: '#' }}"
+      >
+        <span class="custom-gift-banner__button-label">
+          {{- section.settings.hero_button_label | escape -}}
+        </span>
+        {{ arrow_icon }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Bottom bar {%- endcomment -%}
+  {%- if section.settings.bottom_message != blank -%}
     <div class="custom-gift-banner__bottom">
-        {{ section.settings.bottom_message | escape }}
+      {{- section.settings.bottom_message | escape -}}
     </div>
-
-
-
-
-
+  {%- endif -%}
 </section>
 
 {% schema %}
@@ -99,6 +187,12 @@
       "type": "image_picker",
       "id": "hero_image",
       "label": "Hero background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_mobile",
+      "label": "Hero background image (mobile)",
+      "info": "Optional. Shown below 750px at its own aspect ratio, so crop it for portrait. Without it, mobile shows a 3:2 centre crop of the desktop image."
     },
     {
       "type": "text",
