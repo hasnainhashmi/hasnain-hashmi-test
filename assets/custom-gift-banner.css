@@ -3,6 +3,25 @@
    ---------------------------------------------------------
    Self-contained section styles. Nothing here depends on the
    theme's own CSS, custom properties or components.
+
+   Sizing model
+   ------------
+   Measured off both comps (1440x780 and 3840x2340):
+
+   - The hero is always 0.542 x the viewport width, so it holds
+     the artwork's own aspect ratio and the illustration is
+     scaled rather than cropped.
+   - The artwork therefore scales 1:1 with the viewport, which
+     puts the clear area it leaves for the copy at a fixed ~40.6%
+     of the frame at every width.
+   - The copy scales more slowly (2.35x between the two comps,
+     against the viewport's 2.67x). The difference is absorbed by
+     a growing left gutter, which keeps the copy's right edge
+     pinned at ~38.7% -- just under 2% of white to the artwork,
+     at any width.
+
+   So: every value that has to sit beside the artwork is fluid on
+   the design's 1440px basis, with no upper cap on the gutter.
    ========================================================= */
 
 .custom-gift-banner {
@@ -16,10 +35,10 @@
   --cgb-font-sans: "Jost", "Century Gothic", Futura, system-ui, -apple-system, "Segoe UI", sans-serif;
   --cgb-font-serif: "Lustria", Georgia, "Times New Roman", serif;
 
-  /* Rhythm. The hero values are fluid on the design's 1440px basis so the
-     copy shrinks in step with the artwork behind it. */
-  --cgb-gutter: 48px;
-  --cgb-hero-gutter: clamp(24px, calc(100vw * 64 / 1440), 64px);
+  /* Rhythm. The copy stops growing at ~3460px wide; past that the
+     gutter takes over, which is what the 3840px comp does. */
+  --cgb-copy-width: clamp(260px, calc(100vw * 480 / 1440), 1130px);
+  --cgb-gutter: max(20px, calc(38.7vw - var(--cgb-copy-width)));
 
   /* Motion */
   --cgb-duration: 350ms;
@@ -49,10 +68,10 @@
 .custom-gift-banner__top {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: clamp(16px, calc(100vw * 24 / 1440), 64px);
 
-  min-height: 60px;
-  padding: 8px var(--cgb-gutter);
+  min-height: clamp(48px, calc(100vw * 64 / 1440), 172px);
+  padding: clamp(6px, calc(100vw * 8 / 1440), 22px) var(--cgb-gutter);
 
   background-color: var(--cgb-bar-bg);
 }
@@ -62,7 +81,7 @@
 
   margin: 0;
 
-  font-size: 24px;
+  font-size: clamp(18px, calc(100vw * 26 / 1440), 70px);
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.05em;
@@ -71,13 +90,13 @@
 }
 
 /* Centred in the space left between the logo and the button,
-   which is how the mockup measures out -- not centred on the
+   which is how the comps measure out -- not centred on the
    viewport. */
 .custom-gift-banner__top-message {
   flex: 1 1 auto;
   min-width: 0;
 
-  font-size: 16px;
+  font-size: clamp(13px, calc(100vw * 17 / 1440), 45px);
   font-weight: 400;
   line-height: 1.4;
   text-align: center;
@@ -86,9 +105,13 @@
 /* =========================================================
    Buttons
 
-   Shared shell for both CTAs. The colour wipe lives on a
-   ::before layer that scales in from the left while fading in,
-   and retracts back to the left on the way out.
+   Shared shell for both CTAs. Only the font size is fluid --
+   padding, gap and the minimum box are in em, so the whole
+   button scales from that one value.
+
+   The colour wipe lives on a ::before layer that scales in from
+   the left while fading in, and retracts back to the left on the
+   way out.
    ========================================================= */
 
 .custom-gift-banner__button {
@@ -98,20 +121,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 1.75em;
 
-  padding: 12px 20px;
+  padding: 0.875em 1.5em;
   border: 0;
 
   text-decoration: none;
   cursor: pointer;
 
-  /* Figma spec */
+  /* Figma spec at the 1440 basis: 16px / 20.48px (1.28) */
   font-family: var(--cgb-font-sans);
-  font-size: 16px;
+  font-size: clamp(14px, calc(100vw * 16 / 1440), 40px);
   font-style: normal;
   font-weight: 400;
-  line-height: 20.48px;
+  line-height: 1.28;
   letter-spacing: 0;
   text-align: center;
   text-transform: uppercase;
@@ -153,6 +176,9 @@
   flex: 0 0 auto;
   display: block;
 
+  width: 1.625em;
+  height: auto;
+
   color: inherit;
 }
 
@@ -166,8 +192,8 @@
 .custom-gift-banner__top-button {
   flex: 0 0 auto;
 
-  min-width: 194px;
-  min-height: 44px;
+  min-width: 12.9em;
+  min-height: 2.75em;
 
   /* Holds the CTA against the right edge if the centre message is empty. */
   margin-inline-start: auto;
@@ -188,10 +214,8 @@
 /* --- Hero CTA: black -> yellow -------------------------- */
 
 .custom-gift-banner__hero-button {
-  min-width: 206px;
-  min-height: 46px;
-  padding: 13px 24px;
-  gap: 28px;
+  min-width: 13.7em;
+  min-height: 3.06em;
 
   background-color: var(--cgb-ink);
   color: var(--cgb-surface);
@@ -223,15 +247,14 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 1fr auto auto;
-  row-gap: clamp(24px, calc(100vw * 44 / 1440), 44px);
+  row-gap: clamp(20px, calc(100vw * 44 / 1440), 105px);
 
-  /* The design frame is 1440x780, so the hero tracks that ratio: exact at
-     1440, shrinking on smaller screens and capped before it outgrows a
-     laptop viewport. min-height rather than height, so a long heading or a
-     bumped-up font size grows the box instead of being clipped. */
-  min-height: clamp(420px, calc(100vw * 780 / 1440), 860px);
-  padding: var(--cgb-hero-gutter) var(--cgb-hero-gutter)
-    clamp(20px, calc(100vw * 50 / 1440), 50px);
+  /* 780/1440. No upper cap: the 3840 comp is 2081px tall, which is
+     this same ratio. min-height rather than height, so a long heading
+     or a bumped-up font size grows the box instead of being clipped. */
+  min-height: max(420px, calc(100vw * 780 / 1440));
+  padding: var(--cgb-gutter) var(--cgb-gutter)
+    clamp(20px, calc(100vw * 64 / 1440), 220px);
 
   background-color: var(--cgb-surface);
 }
@@ -253,9 +276,9 @@
   height: 100%;
 }
 
-/* Anchored bottom-left, which is where the artwork's negative space sits.
-   Wide viewports crop off the top, narrow ones crop off the right, and the
-   clear area the copy sits in survives both. */
+/* The hero holds the artwork's aspect ratio, so above ~775px there is
+   nothing to crop. Below that, anchoring bottom-left keeps the clear
+   area the copy sits in. */
 .custom-gift-banner__hero-media img {
   object-fit: cover;
   object-position: left bottom;
@@ -268,9 +291,7 @@
   grid-row: 2;
   grid-column: 1;
 
-  /* The artwork's clear area is 476px wide at 1440px, so ~33% of the frame.
-     Tracking that keeps the copy off the illustration at every width. */
-  max-width: min(470px, 33vw);
+  max-width: var(--cgb-copy-width);
 }
 
 .custom-gift-banner__hero-button {
@@ -284,18 +305,18 @@
 }
 
 .custom-gift-banner__heading {
-  margin: 0 0 clamp(18px, calc(100vw * 34 / 1440), 34px);
+  margin: 0 0 clamp(16px, calc(100vw * 36 / 1440), 85px);
 
-  font-size: clamp(32px, calc(100vw * 68 / 1440), 68px);
+  font-size: clamp(30px, calc(100vw * 73 / 1440), 172px);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
 }
 
 .custom-gift-banner__description {
-  font-size: 16px;
+  font-size: clamp(14px, calc(100vw * 17 / 1440), 40px);
   font-weight: 400;
-  line-height: 26px;
+  line-height: 1.65;
 }
 
 .custom-gift-banner__description > :first-child {
@@ -315,12 +336,12 @@
   align-items: center;
   justify-content: center;
 
-  min-height: 30px;
-  padding: 7px var(--cgb-gutter);
+  min-height: clamp(30px, calc(100vw * 32 / 1440), 86px);
+  padding: clamp(6px, calc(100vw * 7 / 1440), 19px) var(--cgb-gutter);
 
   background-color: var(--cgb-bar-bg);
 
-  font-size: 14px;
+  font-size: clamp(11px, calc(100vw * 15 / 1440), 40px);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: 0.02em;
@@ -333,22 +354,11 @@
    ========================================================= */
 
 @media screen and (max-width: 989px) {
-  .custom-gift-banner {
-    --cgb-gutter: 32px;
-  }
-
-  .custom-gift-banner__logo {
-    font-size: 20px;
-  }
-
-  .custom-gift-banner__top-message {
-    font-size: 15px;
-  }
-
+  /* The label alone is enough down here; the fluid min-width would
+     otherwise crowd the centre message out. */
   .custom-gift-banner__top-button {
     min-width: 0;
   }
-
 }
 
 /* =========================================================
@@ -367,6 +377,10 @@
   .custom-gift-banner__top-message,
   .custom-gift-banner__top-button {
     display: none;
+  }
+
+  .custom-gift-banner__top {
+    min-height: 60px;
   }
 
   .custom-gift-banner__logo {
@@ -425,7 +439,11 @@
 
   .custom-gift-banner__description {
     font-size: 15px;
-    line-height: 24px;
+    line-height: 1.6;
+  }
+
+  .custom-gift-banner__button {
+    font-size: 15px;
   }
 
   /* Shares the artwork's grid cell so it overlays it. */
@@ -435,8 +453,7 @@
 
     place-self: center;
 
-    min-width: 190px;
-    min-height: 44px;
+    min-width: 12.6em;
   }
 
   .custom-gift-banner__bottom {
