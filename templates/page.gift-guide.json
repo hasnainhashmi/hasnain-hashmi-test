@@ -11,7 +11,18 @@
   "sections": {
     "custom_gift_banner": {
       "type": "custom-gift-banner",
-      "settings": {}
+      "settings": {
+        "logo_text": "TISSO VISON",
+        "top_message": "Find the ideal gift for your loved ones.",
+        "top_button_label": "CHOOSE GIFT",
+        "top_button_link": "",
+        "hero_image": "shopify://shop_images/hero-bg.png",
+        "hero_heading": "The Gift Guide",
+        "hero_description": "<p>Discover thoughtful gifts for everyone on your list.</p>",
+        "hero_button_label": "SHOP NOW",
+        "hero_button_link": "",
+        "bottom_message": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+      }
     }
   },
   "order": [
