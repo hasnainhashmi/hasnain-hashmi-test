@@ -16,16 +16,14 @@
   --cgb-font-sans: "Jost", "Century Gothic", Futura, system-ui, -apple-system, "Segoe UI", sans-serif;
   --cgb-font-serif: "Lustria", Georgia, "Times New Roman", serif;
 
-  /* Rhythm */
+  /* Rhythm. The hero values are fluid on the design's 1440px basis so the
+     copy shrinks in step with the artwork behind it. */
   --cgb-gutter: 48px;
-  --cgb-hero-gutter: 64px;
+  --cgb-hero-gutter: clamp(24px, calc(100vw * 64 / 1440), 64px);
 
   /* Motion */
   --cgb-duration: 350ms;
   --cgb-ease: cubic-bezier(0.33, 0, 0.2, 1);
-
-  /* Softens the artwork behind the hero copy. Set to 0 to remove. */
-  --cgb-scrim-opacity: 1;
 
   width: 100%;
   margin: 0;
@@ -90,7 +88,7 @@
 
    Shared shell for both CTAs. The colour wipe lives on a
    ::before layer that scales in from the left while fading in,
-   and unwinds to the right on the way back out.
+   and retracts back to the left on the way out.
    ========================================================= */
 
 .custom-gift-banner__button {
@@ -128,8 +126,10 @@
   inset: 0;
   z-index: -1;
 
+  /* Anchored left in both states: the fill runs out to the right on
+     hover, then retracts back the way it came. */
   transform: scaleX(0);
-  transform-origin: right center;
+  transform-origin: left center;
   opacity: 0;
 
   transition:
@@ -140,7 +140,6 @@
 .custom-gift-banner__button:hover::before,
 .custom-gift-banner__button:focus-visible::before {
   transform: scaleX(1);
-  transform-origin: left center;
   opacity: 1;
 }
 
@@ -224,10 +223,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 1fr auto auto;
-  row-gap: 44px;
+  row-gap: clamp(24px, calc(100vw * 44 / 1440), 44px);
 
-  min-height: clamp(520px, 55vw, 730px);
-  padding: var(--cgb-hero-gutter) var(--cgb-hero-gutter) 50px;
+  /* The design frame is 1440x780, so the hero tracks that ratio: exact at
+     1440, shrinking on smaller screens and capped before it outgrows a
+     laptop viewport. min-height rather than height, so a long heading or a
+     bumped-up font size grows the box instead of being clipped. */
+  min-height: clamp(420px, calc(100vw * 780 / 1440), 860px);
+  padding: var(--cgb-hero-gutter) var(--cgb-hero-gutter)
+    clamp(20px, calc(100vw * 50 / 1440), 50px);
 
   background-color: var(--cgb-surface);
 }
@@ -249,44 +253,29 @@
   height: 100%;
 }
 
+/* Anchored bottom-left, which is where the artwork's negative space sits.
+   Wide viewports crop off the top, narrow ones crop off the right, and the
+   clear area the copy sits in survives both. */
 .custom-gift-banner__hero-media img {
   object-fit: cover;
-  object-position: center;
-}
-
-/* Keeps the copy readable wherever the artwork happens to crop
-   to. Invisible over the white of the illustration itself. */
-.custom-gift-banner__hero::after {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-
-  background: radial-gradient(
-    120% 95% at 0% 100%,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.82) 38%,
-    rgba(255, 255, 255, 0) 72%
-  );
-  opacity: var(--cgb-scrim-opacity);
-
-  pointer-events: none;
+  object-position: left bottom;
 }
 
 .custom-gift-banner__hero-copy {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 
   grid-row: 2;
   grid-column: 1;
 
-  max-width: 470px;
+  /* The artwork's clear area is 476px wide at 1440px, so ~33% of the frame.
+     Tracking that keeps the copy off the illustration at every width. */
+  max-width: min(470px, 33vw);
 }
 
 .custom-gift-banner__hero-button {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 
   grid-row: 3;
   grid-column: 1;
@@ -295,9 +284,9 @@
 }
 
 .custom-gift-banner__heading {
-  margin: 0 0 34px;
+  margin: 0 0 clamp(18px, calc(100vw * 34 / 1440), 34px);
 
-  font-size: clamp(40px, 5vw, 68px);
+  font-size: clamp(32px, calc(100vw * 68 / 1440), 68px);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -346,7 +335,6 @@
 @media screen and (max-width: 989px) {
   .custom-gift-banner {
     --cgb-gutter: 32px;
-    --cgb-hero-gutter: 40px;
   }
 
   .custom-gift-banner__logo {
@@ -360,6 +348,7 @@
   .custom-gift-banner__top-button {
     min-width: 0;
   }
+
 }
 
 /* =========================================================
@@ -415,14 +404,12 @@
     height: auto;
   }
 
-  .custom-gift-banner__hero::after {
-    content: none;
-  }
-
   .custom-gift-banner__hero-copy {
     grid-row: 1;
     grid-column: 1;
 
+    /* No longer sharing space with the artwork, so the cap is about line
+       length rather than the illustration. */
     max-width: 34ch;
     margin-inline: auto;
     padding: 40px 20px 32px;
