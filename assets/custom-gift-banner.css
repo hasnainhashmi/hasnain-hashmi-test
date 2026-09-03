@@ -1,0 +1,344 @@
+/* =========================================================
+   Custom Gift Banner
+   ========================================================= */
+
+.custom-gift-banner {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Make box sizing predictable for everything inside */
+.custom-gift-banner *,
+.custom-gift-banner *::before,
+.custom-gift-banner *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   Top Bar
+   ========================================================= */
+
+.custom-gift-banner__top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  width: 100%;
+  min-height: 72px;
+
+  padding: 0 40px;
+
+  background-color: #f4c7a1;
+}
+
+
+/* Logo - left */
+
+.custom-gift-banner__logo {
+  justify-self: start;
+
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+
+/* Center message */
+
+.custom-gift-banner__top-message {
+  justify-self: center;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  text-align: center;
+}
+
+
+/* Top button - right */
+
+.custom-gift-banner__top-button {
+  justify-self: end;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  min-width: 150px;
+  min-height: 44px;
+
+  padding: 10px 20px;
+
+  background-color: #000;
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.custom-gift-banner__top-button span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.custom-gift-banner__top-button:hover {
+  background-color: #222;
+  color: #fff;
+}
+
+
+/* =========================================================
+   Hero
+   ========================================================= */
+
+.custom-gift-banner__hero {
+  position: relative;
+
+  display: flex;
+  align-items: flex-end;
+
+  width: 100%;
+  min-height: 650px;
+
+  padding: 60px 60px;
+
+  background-color: #ddd;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+/* Hero content */
+
+.custom-gift-banner__hero-content {
+  max-width: 560px;
+
+  color: #fff;
+}
+
+
+/* Hero heading */
+
+.custom-gift-banner__hero-content h1 {
+  margin: 0 0 18px;
+
+  font-size: clamp(48px, 6vw, 88px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+
+/* Hero description */
+
+.custom-gift-banner__description {
+  max-width: 460px;
+
+  margin-bottom: 28px;
+
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+
+/* Remove default paragraph spacing from rich text */
+
+.custom-gift-banner__description p {
+  margin: 0;
+}
+
+
+/* Hero button */
+
+.custom-gift-banner__hero-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  min-width: 170px;
+  min-height: 50px;
+
+  padding: 12px 24px;
+
+  background-color: #fff;
+  color: #000;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.custom-gift-banner__hero-button span {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.custom-gift-banner__hero-button:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+
+/* =========================================================
+   Bottom Bar
+   ========================================================= */
+
+.custom-gift-banner__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 64px;
+
+  padding: 15px 30px;
+
+  background-color: #f4c7a1;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   Tablet
+   ========================================================= */
+
+@media screen and (max-width: 749px) {
+
+  .custom-gift-banner__top {
+    grid-template-columns: 1fr auto;
+
+    min-height: 64px;
+
+    padding: 0 20px;
+  }
+
+  .custom-gift-banner__top-message {
+    display: none;
+  }
+
+  .custom-gift-banner__logo {
+    font-size: 16px;
+  }
+
+  .custom-gift-banner__top-button {
+    min-width: 130px;
+    min-height: 40px;
+
+    padding: 8px 16px;
+
+    font-size: 11px;
+  }
+
+  .custom-gift-banner__hero {
+    min-height: 600px;
+
+    padding: 40px 25px;
+  }
+
+  .custom-gift-banner__hero-content {
+    max-width: 90%;
+  }
+
+  .custom-gift-banner__hero-content h1 {
+    font-size: clamp(42px, 11vw, 64px);
+  }
+
+  .custom-gift-banner__description {
+    font-size: 15px;
+  }
+
+  .custom-gift-banner__bottom {
+    min-height: 60px;
+
+    padding: 14px 20px;
+
+    font-size: 11px;
+  }
+}
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media screen and (max-width: 480px) {
+
+  .custom-gift-banner__top {
+    padding: 0 15px;
+  }
+
+  .custom-gift-banner__logo {
+    font-size: 14px;
+  }
+
+  .custom-gift-banner__top-button {
+    min-width: auto;
+
+    padding: 8px 12px;
+  }
+
+  .custom-gift-banner__top-button span {
+    font-size: 15px;
+  }
+
+  .custom-gift-banner__hero {
+    min-height: 550px;
+
+    padding: 30px 20px;
+  }
+
+  .custom-gift-banner__hero-content {
+    max-width: 100%;
+  }
+
+  .custom-gift-banner__hero-content h1 {
+    margin-bottom: 14px;
+
+    font-size: clamp(38px, 12vw, 52px);
+  }
+
+  .custom-gift-banner__description {
+    margin-bottom: 22px;
+
+    font-size: 14px;
+  }
+
+  .custom-gift-banner__hero-button {
+    min-height: 46px;
+  }
+
+  .custom-gift-banner__bottom {
+    min-height: 56px;
+
+    padding: 12px 15px;
+
+    font-size: 10px;
+  }
+}

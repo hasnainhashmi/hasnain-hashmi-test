@@ -1,4 +1,11 @@
 {
-  "sections": {},
-  "order": []
+  "sections": {
+    "custom_gift_banner": {
+      "type": "custom-gift-banner",
+      "settings": {}
+    }
+  },
+  "order": [
+    "custom_gift_banner"
+  ]
 }

@@ -1,0 +1,137 @@
+<section class="custom-gift-banner">
+    {% comment %} top bar START {% endcomment %}
+    <div class="custom-gift-banner__top">
+        <div class="custom-gift-banner__logo">
+            {{ section.settings.logo_text | escape }}
+        </div>    
+        <div class="custom-gift-banner__top-message">
+            {{ section.settings.top_message | escape }}
+        </div>
+        {% if section.settings.top_button_label != blank %}
+            <a 
+                href="{{ section.settings.top_button_link }}"
+                class="custom-gift-banner__top-button"
+            >
+                {{ section.settings.top_button_label }}
+                <span>-></span>
+            </a>
+        {% endif %}    
+    </div>
+    {% comment %} top bar END {% endcomment %}
+
+    {% comment %} Hero START {% endcomment %}
+    <div 
+        class="custom-gift-banner__hero"
+        {% if section.settings.hero_image != blank %}
+        style="background-image: url('{{ section.settings.hero_image | image_url: width: 1200 }}')"  
+        {% endif %}  
+    >
+    
+        <div class="custom-gift-banner__hero-content">
+
+            {% if section.settings.hero_heading != blank %}
+                <h1>
+                    {{ section.settings.hero_heading }}
+                </h1> 
+            {% endif %}
+
+            {% if section.settings.hero_description != blank %}
+                <div class="custom-gift-banner__description">
+                {{ section.settings.hero_description }}
+                </div>
+            {% endif %}
+
+            {% if section.settings.hero_button_label != blank %}
+                <a
+                href="{{ section.settings.hero_button_link }}"
+                class="custom-gift-banner__hero-button"
+                >
+                {{ section.settings.hero_button_label | escape }}
+                <span aria-hidden="true">→</span>
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+    {% comment %} Hero END {% endcomment %}
+
+    {% comment %} Bottom bar START {% endcomment %}
+    <div class="custom-gift-banner__bottom">
+        {{ section.settings.bottom_message | escape }}
+    </div>
+
+
+
+
+
+</section>
+
+{% schema %}
+{
+  "name": "Custom Gift Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "default": "TISSO VISON"
+    },
+    {
+      "type": "text",
+      "id": "top_message",
+      "label": "Top message",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "top_button_label",
+      "label": "Top button label",
+      "default": "CHOOSE GIFT"
+    },
+    {
+      "type": "url",
+      "id": "top_button_link",
+      "label": "Top button link"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero background image"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Hero heading",
+      "default": "The Gift Guide"
+    },
+    {
+      "type": "richtext",
+      "id": "hero_description",
+      "label": "Hero description",
+      "default": "<p>Discover thoughtful gifts for everyone on your list.</p>"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_label",
+      "label": "Hero button label",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_link",
+      "label": "Hero button link"
+    },
+    {
+      "type": "text",
+      "id": "bottom_message",
+      "label": "Bottom message",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Gift Banner"
+    }
+  ]
+}
+{% endschema %}
