@@ -1,0 +1,230 @@
+/* =========================================================
+   Custom Gift Grid
+   ---------------------------------------------------------
+   Self-contained section styles. Nothing here depends on the
+   theme's own CSS, custom properties or components.
+
+   Sizing follows the same 1440px basis as the banner section,
+   so the two stay in proportion with each other at any width.
+   ========================================================= */
+
+.custom-gift-grid {
+  /* Palette */
+  --cgg-ink: #000;
+  --cgg-surface: #fff;
+  --cgg-placeholder: rgba(0, 0, 0, 0.06);
+
+  /* Type */
+  --cgg-font-sans: "Jost", "Century Gothic", Futura, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cgg-font-serif: "Lustria", Georgia, "Times New Roman", serif;
+
+  /* Rhythm. This mirrors the banner's gutter expression so the two
+     sections line up on the left edge at every width. */
+  --cgg-gutter: max(20px, calc(38.7vw - clamp(260px, calc(100vw * 480 / 1440), 1130px)));
+  --cgg-gap: clamp(8px, calc(100vw * 20 / 1440), 54px);
+
+  /* Hotspot */
+  --cgg-hotspot-size: clamp(28px, calc(100vw * 36 / 1440), 96px);
+
+  /* Motion */
+  --cgg-duration: 250ms;
+  --cgg-ease: cubic-bezier(0.33, 0, 0.2, 1);
+
+  width: 100%;
+  padding: clamp(40px, calc(100vw * 80 / 1440), 213px) var(--cgg-gutter);
+
+  background-color: var(--cgg-surface);
+  color: var(--cgg-ink);
+
+  font-family: var(--cgg-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.custom-gift-grid *,
+.custom-gift-grid *::before,
+.custom-gift-grid *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   Heading
+   ========================================================= */
+
+.custom-gift-grid__heading {
+  margin: 0 0 clamp(20px, calc(100vw * 42 / 1440), 112px);
+
+  font-family: var(--cgg-font-serif);
+  font-size: clamp(24px, calc(100vw * 40 / 1440), 107px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* =========================================================
+   Grid
+   ========================================================= */
+
+.custom-gift-grid__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cgg-gap);
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+/* Establishes the containing block the hotspot is positioned against. */
+.custom-gift-grid__item {
+  position: relative;
+
+  margin: 0;
+}
+
+.custom-gift-grid__media {
+  position: relative;
+
+  overflow: hidden;
+
+  /* Measured off the comp: 270 x 277 per tile. */
+  aspect-ratio: 270 / 277;
+
+  background-color: var(--cgg-placeholder);
+}
+
+.custom-gift-grid__media img,
+.custom-gift-grid__media .custom-gift-grid__placeholder {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+}
+
+.custom-gift-grid__placeholder {
+  fill: rgba(0, 0, 0, 0.18);
+}
+
+/* =========================================================
+   Hotspot
+
+   Placed per block from two range settings, so each tile's
+   button can sit clear of the subject the way the comp does.
+   Translated by -50% so the setting addresses the centre of
+   the disc rather than its top-left corner.
+   ========================================================= */
+
+.custom-gift-grid__hotspot {
+  position: absolute;
+  top: var(--cgg-hotspot-y, 50%);
+  left: var(--cgg-hotspot-x, 50%);
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--cgg-hotspot-size);
+  height: var(--cgg-hotspot-size);
+  padding: 0;
+
+  transform: translate(-50%, -50%);
+
+  border: 0;
+  border-radius: 50%;
+
+  background-color: var(--cgg-surface);
+  color: var(--cgg-ink);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+
+  cursor: pointer;
+
+  transition:
+    transform var(--cgg-duration) var(--cgg-ease),
+    background-color var(--cgg-duration) var(--cgg-ease),
+    color var(--cgg-duration) var(--cgg-ease);
+}
+
+.custom-gift-grid__hotspot-icon {
+  display: block;
+
+  width: 38%;
+  height: auto;
+}
+
+.custom-gift-grid__hotspot:hover,
+.custom-gift-grid__hotspot:focus-visible {
+  transform: translate(-50%, -50%) scale(1.12);
+
+  background-color: var(--cgg-ink);
+  color: var(--cgg-surface);
+}
+
+.custom-gift-grid__hotspot:focus-visible {
+  outline: 2px solid var(--cgg-ink);
+  outline-offset: 3px;
+}
+
+/* The disc is smaller than the 44px tap target minimum at narrow
+   widths, so extend the hit area without changing how it looks. */
+.custom-gift-grid__hotspot::after {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+
+  transform: translate(-50%, -50%);
+}
+
+/* =========================================================
+   Mobile
+
+   Two columns, tighter gap, centred heading -- per the mobile
+   mockup.
+   ========================================================= */
+
+@media screen and (max-width: 749px) {
+  .custom-gift-grid {
+    --cgg-gutter: 20px;
+    --cgg-gap: 8px;
+
+    padding-block: 40px;
+  }
+
+  .custom-gift-grid__heading {
+    margin-bottom: 24px;
+
+    font-size: clamp(22px, 6.5vw, 28px);
+    text-align: center;
+  }
+
+  .custom-gift-grid__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .custom-gift-grid__hotspot {
+    --cgg-hotspot-size: 30px;
+  }
+}
+
+/* =========================================================
+   Reduced motion
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-gift-grid__hotspot {
+    transition-duration: 1ms;
+  }
+
+  .custom-gift-grid__hotspot:hover,
+  .custom-gift-grid__hotspot:focus-visible {
+    transform: translate(-50%, -50%);
+  }
+}

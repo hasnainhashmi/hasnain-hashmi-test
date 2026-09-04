@@ -1,0 +1,157 @@
+{{ 'custom-gift-grid.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Custom Gift Grid
+  ----------------
+  Six lifestyle tiles, each tied to a product picked in the customizer.
+  Every tile carries a hotspot button which will open that product's
+  quick-view dialog.
+
+  The tile image and the product are deliberately separate settings: the
+  comp shows a lifestyle shot on the grid and the product's own shot in
+  the dialog. Leaving the tile image empty falls back to the product's
+  featured image.
+{%- endcomment -%}
+
+<section class="custom-gift-grid">
+  {%- if section.settings.heading != blank -%}
+    <h2 class="custom-gift-grid__heading">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+
+  {%- if section.blocks.size > 0 -%}
+    <ul class="custom-gift-grid__list" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign product = block.settings.product
+          assign tile_image = block.settings.image | default: product.featured_image
+        -%}
+
+        <li class="custom-gift-grid__item" {{ block.shopify_attributes }}>
+          <div class="custom-gift-grid__media">
+            {%- if tile_image != blank -%}
+              {%- capture tile_srcset -%}
+                {%- render 'custom-gift-srcset',
+                  image: tile_image,
+                  widths: '320,480,640,860,1200,1600'
+                -%}
+              {%- endcapture -%}
+
+              <img
+                src="{{ tile_image | image_url: width: 860 }}"
+                srcset="{{ tile_srcset }}"
+                sizes="(max-width: 749px) 46vw, 30vw"
+                width="{{ tile_image.width }}"
+                height="{{ tile_image.height }}"
+                alt="{{ tile_image.alt | default: product.title | escape }}"
+                loading="lazy"
+                decoding="async"
+              >
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'custom-gift-grid__placeholder' }}
+            {%- endif -%}
+          </div>
+
+          {%- comment -%}
+            No product picked yet means nothing to quick-view, so the
+            hotspot is left off rather than rendered inert.
+          {%- endcomment -%}
+          {%- if product != blank -%}
+            <button
+              type="button"
+              class="custom-gift-grid__hotspot"
+              style="--cgg-hotspot-x: {{ block.settings.hotspot_x }}%; --cgg-hotspot-y: {{ block.settings.hotspot_y }}%;"
+              aria-haspopup="dialog"
+              aria-label="{{ 'products.product.quick_view' | t: title: product.title | default: product.title }}"
+              data-cgg-open="{{ block.id }}"
+            >
+              <svg
+                class="custom-gift-grid__hotspot-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 1v12M1 7h12"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Custom Gift Grid",
+  "tag": "section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Tile image",
+          "info": "Optional. The lifestyle shot for the grid. Falls back to the product's featured image."
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x",
+          "label": "Hotspot position, across",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y",
+          "label": "Hotspot position, down",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Gift Grid",
+      "blocks": [
+        { "type": "product", "settings": { "hotspot_x": 62, "hotspot_y": 56 } },
+        { "type": "product", "settings": { "hotspot_x": 84, "hotspot_y": 52 } },
+        { "type": "product", "settings": { "hotspot_x": 63, "hotspot_y": 21 } },
+        { "type": "product", "settings": { "hotspot_x": 72, "hotspot_y": 19 } },
+        { "type": "product", "settings": { "hotspot_x": 52, "hotspot_y": 26 } },
+        { "type": "product", "settings": { "hotspot_x": 76, "hotspot_y": 40 } }
+      ]
+    }
+  ]
+}
+{% endschema %}
