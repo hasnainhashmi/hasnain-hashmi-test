@@ -13,8 +13,9 @@
    * dialog's price, hidden variant id and submit state in step with it.
    */
   class QuickView {
-    constructor(dialog) {
+    constructor(dialog, bonus) {
       this.dialog = dialog;
+      this.bonus = bonus || { variantId: null, values: [] };
       this.form = dialog.querySelector('[data-cgg-form]');
       this.price = dialog.querySelector('[data-cgg-price]');
       this.variantInput = dialog.querySelector('[data-cgg-variant-id]');
@@ -213,7 +214,30 @@
 
     /** The line items this add should create. */
     buildItems(variant) {
-      return [{ id: variant.id, quantity: 1 }];
+      const items = [{ id: variant.id, quantity: 1 }];
+
+      if (this.shouldAddBonus(variant)) {
+        items.push({ id: this.bonus.variantId, quantity: 1 });
+      }
+
+      return items;
+    }
+
+    /**
+     * True when the chosen variant carries every trigger value, so the
+     * bonus product rides along in the same request.
+     */
+    shouldAddBonus(variant) {
+      const { variantId, values } = this.bonus;
+
+      if (!variantId || values.length === 0) return false;
+
+      // Never let the bonus product trigger a second copy of itself.
+      if (variantId === variant.id) return false;
+
+      const chosen = variant.options.map((value) => String(value).trim().toLowerCase());
+
+      return values.every((value) => chosen.includes(value));
     }
 
     setBusy(busy) {
@@ -295,8 +319,17 @@
 
     const views = new Map();
 
+    // Section level, so all six dialogs share one rule.
+    const bonus = {
+      variantId: Number(section.dataset.cggBonusVariant) || null,
+      values: (section.dataset.cggBonusValues || '')
+        .split(',')
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean),
+    };
+
     section.querySelectorAll('[data-cgg-dialog]').forEach((dialog) => {
-      views.set(dialog.dataset.cggDialog, new QuickView(dialog));
+      views.set(dialog.dataset.cggDialog, new QuickView(dialog, bonus));
     });
 
     section.addEventListener('click', (event) => {

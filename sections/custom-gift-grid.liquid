@@ -14,7 +14,24 @@
   featured image.
 {%- endcomment -%}
 
-<section class="custom-gift-grid">
+{%- comment -%}
+  The brief calls for a specific pairing: anything bought in Black /
+  Medium brings the Soft Winter Jacket along with it. Both the bonus
+  product and the values that trigger it are settings rather than
+  hardcoded, so a merchant can change the rule without a deploy.
+{%- endcomment -%}
+{%- liquid
+  assign bonus_product = section.settings.bonus_product
+  assign bonus_variant = bonus_product.first_available_variant
+-%}
+
+<section
+  class="custom-gift-grid"
+  {% if bonus_variant and section.settings.bonus_trigger_values != blank %}
+    data-cgg-bonus-variant="{{ bonus_variant.id }}"
+    data-cgg-bonus-values="{{ section.settings.bonus_trigger_values | escape }}"
+  {% endif %}
+>
   {%- if section.settings.heading != blank -%}
     <h2 class="custom-gift-grid__heading">{{ section.settings.heading | escape }}</h2>
   {%- endif -%}
@@ -318,6 +335,23 @@
       "id": "heading",
       "label": "Heading",
       "default": "Tisso vison in the wild"
+    },
+    {
+      "type": "header",
+      "content": "Bonus product"
+    },
+    {
+      "type": "product",
+      "id": "bonus_product",
+      "label": "Bonus product",
+      "info": "Added to the cart automatically when a product matching the option values below is added."
+    },
+    {
+      "type": "text",
+      "id": "bonus_trigger_values",
+      "label": "Trigger option values",
+      "default": "Black, Medium",
+      "info": "Comma separated. The bonus is added only when the chosen variant matches every value. Case insensitive."
     }
   ],
   "blocks": [
