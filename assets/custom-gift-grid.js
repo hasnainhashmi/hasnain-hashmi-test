@@ -24,9 +24,11 @@
       this.optionGroups = Array.from(dialog.querySelectorAll('[data-cgg-option]'));
       this.variants = QuickView.readVariants(dialog);
       this.opener = null;
+      this.busy = false;
 
       this.bindOptions();
       this.bindDismiss();
+      this.bindSubmit();
       this.update();
     }
 
@@ -141,6 +143,88 @@
       } else {
         this.dialog.removeAttribute('open');
       }
+    }
+
+    /**
+     * The form's own action is /cart/add, which is the no-JS fallback.
+     * Its .js sibling is the AJAX endpoint, and reading it off the form
+     * keeps whatever locale prefix Liquid put there.
+     */
+    get cartAddUrl() {
+      return `${this.form.getAttribute('action')}.js`;
+    }
+
+    bindSubmit() {
+      if (!this.form) return;
+
+      this.form.addEventListener('submit', (event) => {
+        // Without fetch, let the browser post the form the old way.
+        if (typeof window.fetch !== 'function') return;
+
+        event.preventDefault();
+        this.addToCart();
+      });
+    }
+
+    /**
+     * Everything goes up in a single items[] request. Adding line items
+     * one call at a time can half-fail and leave the cart inconsistent.
+     */
+    async addToCart() {
+      const variant = this.currentVariant;
+      if (this.busy || !variant || !variant.available) return;
+
+      this.busy = true;
+      this.setBusy(true);
+      this.setStatus('');
+
+      try {
+        const response = await fetch(this.cartAddUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ items: this.buildItems(variant) }),
+        });
+
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(
+            (payload && (payload.description || payload.message)) || 'Could not add to cart.'
+          );
+        }
+
+        // Lets anything else on the page refresh without coupling to it.
+        document.dispatchEvent(
+          new CustomEvent('cart:updated', {
+            bubbles: true,
+            detail: { items: payload ? payload.items : null },
+          })
+        );
+
+        this.setStatus('Added to cart.', 'success');
+        window.setTimeout(() => this.close(), 1200);
+      } catch (error) {
+        this.setStatus(error.message || 'Could not add to cart.', 'error');
+      } finally {
+        this.busy = false;
+        this.setBusy(false);
+      }
+    }
+
+    /** The line items this add should create. */
+    buildItems(variant) {
+      return [{ id: variant.id, quantity: 1 }];
+    }
+
+    setBusy(busy) {
+      if (busy) {
+        if (this.submit) this.submit.disabled = true;
+        if (this.submitLabel) this.submitLabel.textContent = 'Adding...';
+        return;
+      }
+
+      // Restores the label and disabled state from the resolved variant.
+      this.update();
     }
 
     /** Reflects the resolved variant into the dialog. */
