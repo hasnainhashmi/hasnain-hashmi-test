@@ -4,7 +4,7 @@
   Custom Gift Grid
   ----------------
   Six lifestyle tiles, each tied to a product picked in the customizer.
-  Every tile carries a hotspot button which will open that product's
+  Every tile carries a hotspot button which opens that product's
   quick-view dialog.
 
   The tile image and the product are deliberately separate settings: the
@@ -81,6 +81,224 @@
                 />
               </svg>
             </button>
+
+            {%- comment -%}
+              Quick-view dialog. Rendered server side rather than fetched, so
+              the option controls come straight from the product and the form
+              still submits with JS off.
+
+              <dialog> is deliberate: showModal() puts it in the top layer, so
+              it escapes the grid's overflow, and focus trapping, Esc to close
+              and background inertness all come for free.
+            {%- endcomment -%}
+            {%- assign current_variant = product.selected_or_first_available_variant -%}
+
+            <dialog
+              class="custom-gift-grid__dialog"
+              id="cgg-dialog-{{ block.id }}"
+              data-cgg-dialog="{{ block.id }}"
+              aria-labelledby="cgg-title-{{ block.id }}"
+            >
+              <div class="custom-gift-grid__dialog-inner">
+                <button
+                  type="button"
+                  class="custom-gift-grid__close"
+                  data-cgg-close
+                  aria-label="Close"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path
+                      d="M1 1l12 12M13 1L1 13"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+
+                <div class="custom-gift-grid__summary">
+                  {%- if product.featured_image != blank -%}
+                    <div class="custom-gift-grid__summary-media">
+                      <img
+                        src="{{ product.featured_image | image_url: width: 400 }}"
+                        srcset="{{ product.featured_image | image_url: width: 200 }} 200w, {{ product.featured_image | image_url: width: 400 }} 400w, {{ product.featured_image | image_url: width: 600 }} 600w"
+                        sizes="160px"
+                        width="{{ product.featured_image.width }}"
+                        height="{{ product.featured_image.height }}"
+                        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                        loading="lazy"
+                        decoding="async"
+                      >
+                    </div>
+                  {%- endif -%}
+
+                  <div class="custom-gift-grid__summary-text">
+                    <h3 class="custom-gift-grid__title" id="cgg-title-{{ block.id }}">
+                      {{- product.title | escape -}}
+                    </h3>
+
+                    <p class="custom-gift-grid__price" data-cgg-price>
+                      {{- current_variant.price | money -}}
+                    </p>
+
+                    {%- if product.description != blank -%}
+                      <div class="custom-gift-grid__description">
+                        {{- product.description | strip_html | truncatewords: 26 -}}
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+
+                <form
+                  class="custom-gift-grid__form"
+                  method="post"
+                  action="{{ routes.cart_add_url }}"
+                  enctype="multipart/form-data"
+                  data-cgg-form
+                >
+                  <input type="hidden" name="form_type" value="product">
+                  <input type="hidden" name="quantity" value="1">
+                  <input
+                    type="hidden"
+                    name="id"
+                    value="{{ current_variant.id }}"
+                    data-cgg-variant-id
+                  >
+
+                  {%- comment -%}
+                    Driven off product.options_with_values, so any product
+                    renders. The comp shows the first option as a segmented
+                    control and the rest as dropdowns.
+                  {%- endcomment -%}
+                  {%- for option in product.options_with_values -%}
+                    {%- liquid
+                      assign option_position = forloop.index
+                      assign selected_value = current_variant.options[forloop.index0]
+                      assign label_id = 'cgg-opt-' | append: block.id | append: '-' | append: option_position
+                    -%}
+
+                    <div class="custom-gift-grid__option" data-cgg-option="{{ option_position }}">
+                      <span class="custom-gift-grid__option-label" id="{{ label_id }}">
+                        {{- option.name | escape -}}
+                      </span>
+
+                      {%- if forloop.first -%}
+                        <div
+                          class="custom-gift-grid__swatches"
+                          role="radiogroup"
+                          aria-labelledby="{{ label_id }}"
+                        >
+                          {%- for value in option.values -%}
+                            <button
+                              type="button"
+                              class="custom-gift-grid__swatch"
+                              role="radio"
+                              aria-checked="{% if value == selected_value %}true{% else %}false{% endif %}"
+                              tabindex="{% if value == selected_value %}0{% else %}-1{% endif %}"
+                              data-cgg-value="{{ value | escape }}"
+                            >
+                              {{- value | escape -}}
+                            </button>
+                          {%- endfor -%}
+                        </div>
+                      {%- else -%}
+                        <div class="custom-gift-grid__select-wrap">
+                          <select
+                            class="custom-gift-grid__select"
+                            aria-labelledby="{{ label_id }}"
+                            data-cgg-select
+                          >
+                            {%- for value in option.values -%}
+                              <option
+                                value="{{ value | escape }}"
+                                {% if value == selected_value %}selected{% endif %}
+                              >
+                                {{- value | escape -}}
+                              </option>
+                            {%- endfor -%}
+                          </select>
+
+                          <svg
+                            class="custom-gift-grid__select-chevron"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="8"
+                            viewBox="0 0 14 8"
+                            aria-hidden="true"
+                            focusable="false"
+                          >
+                            <path
+                              d="M1 1l6 6 6-6"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              fill="none"
+                              stroke-linecap="round"
+                            />
+                          </svg>
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+
+                  <button
+                    type="submit"
+                    class="custom-gift-grid__atc"
+                    data-cgg-submit
+                    {% unless current_variant.available %}disabled{% endunless %}
+                  >
+                    <span class="custom-gift-grid__atc-label" data-cgg-submit-label>
+                      {%- if current_variant.available -%}
+                        Add to cart
+                      {%- else -%}
+                        Sold out
+                      {%- endif -%}
+                    </span>
+
+                    <svg
+                      class="custom-gift-grid__atc-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="26"
+                      height="12"
+                      viewBox="0 0 26 12"
+                      fill="none"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        d="M0.75 4.77298L7.37629e-08 4.77298L-7.37629e-08 6.27298L0.75 6.27298L0.75 4.77298ZM25.2803 6.05331C25.5732 5.76042 25.5732 5.28554 25.2803 4.99265L20.5074 0.21968C20.2145 -0.073213 19.7396 -0.0732131 19.4467 0.21968C19.1538 0.512574 19.1538 0.987447 19.4467 1.28034L23.6893 5.52298L19.4467 9.76562C19.1538 10.0585 19.1538 10.5334 19.4467 10.8263C19.7396 11.1192 20.2145 11.1192 20.5074 10.8263L25.2803 6.05331ZM0.75 6.27298L24.75 6.27298L24.75 4.77298L0.75 4.77298L0.75 6.27298Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+
+                  <p class="custom-gift-grid__status" data-cgg-status role="status" aria-live="polite"></p>
+                </form>
+
+                {%- comment -%}
+                  Trimmed on purpose: the resolver only needs these fields, and
+                  product.variants | json carries a great deal more.
+                {%- endcomment -%}
+                <script type="application/json" data-cgg-variants>
+                  [
+                    {%- for variant in product.variants -%}
+                      {
+                        "id": {{ variant.id }},
+                        "options": {{ variant.options | json }},
+                        "available": {{ variant.available }},
+                        "price": {{ variant.price | money | json }}
+                      }{% unless forloop.last %},{% endunless %}
+                    {%- endfor -%}
+                  ]
+                </script>
+              </div>
+            </dialog>
           {%- endif -%}
         </li>
       {%- endfor -%}
