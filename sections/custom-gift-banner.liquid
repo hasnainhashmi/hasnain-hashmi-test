@@ -83,7 +83,7 @@
 
     {%- if hero_image_desktop != blank -%}
       {%- capture hero_srcset -%}
-        {%- render 'custom-gift-banner-srcset',
+        {%- render 'custom-gift-srcset',
           image: hero_image_desktop,
           widths: '640,960,1280,1600,2000,2400,3000'
         -%}
@@ -93,7 +93,7 @@
         <picture>
           {%- if hero_image_mobile != blank -%}
             {%- capture hero_mobile_srcset -%}
-              {%- render 'custom-gift-banner-srcset',
+              {%- render 'custom-gift-srcset',
                 image: hero_image_mobile,
                 widths: '480,640,768,960,1280'
               -%}
