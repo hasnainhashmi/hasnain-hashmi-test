@@ -228,3 +228,332 @@
     transform: translate(-50%, -50%);
   }
 }
+
+
+/* =========================================================
+   Quick-view dialog
+
+   One font-size drives the whole card: everything inside is
+   in em, so the modal scales as a unit on the same 1440px
+   basis as the rest of the page.
+   ========================================================= */
+
+.custom-gift-grid__dialog {
+  --cgg-line: rgba(0, 0, 0, 0.85);
+
+  width: min(92vw, 22.15em);
+  max-height: 92vh;
+  padding: 0;
+  overflow: auto;
+
+  border: 0;
+
+  background-color: var(--cgg-surface);
+  color: var(--cgg-ink);
+
+  font-family: var(--cgg-font-sans);
+  font-size: clamp(14px, calc(100vw * 14 / 1440), 28px);
+  line-height: 1.35;
+}
+
+/* Measured off the comp: a 25% black scrim. */
+.custom-gift-grid__dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.custom-gift-grid__dialog[open] {
+  animation: cgg-dialog-in 220ms var(--cgg-ease);
+}
+
+.custom-gift-grid__dialog[open]::backdrop {
+  animation: cgg-backdrop-in 220ms var(--cgg-ease);
+}
+
+@keyframes cgg-dialog-in {
+  from { opacity: 0; transform: translateY(0.75em); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes cgg-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.custom-gift-grid__dialog-inner {
+  position: relative;
+
+  padding: 2.6em 1.45em 1.8em;
+}
+
+/* --- Close ---------------------------------------------- */
+
+.custom-gift-grid__close {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 1.9em;
+  height: 1.9em;
+  padding: 0;
+
+  border: 0;
+  background: none;
+  color: currentColor;
+
+  cursor: pointer;
+}
+
+.custom-gift-grid__close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* --- Summary -------------------------------------------- */
+
+.custom-gift-grid__summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75em;
+
+  margin-bottom: 1.35em;
+}
+
+.custom-gift-grid__summary-media {
+  flex: 0 0 auto;
+
+  width: 8.6em;
+  aspect-ratio: 6 / 7;
+  overflow: hidden;
+}
+
+.custom-gift-grid__summary-media img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.custom-gift-grid__summary-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.custom-gift-grid__title {
+  margin: 0 0 0.75em;
+
+  font-size: 1.29em;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.custom-gift-grid__price {
+  margin: 0 0 0.75em;
+
+  font-size: 1.29em;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.custom-gift-grid__description {
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+/* --- Options -------------------------------------------- */
+
+.custom-gift-grid__option {
+  margin-bottom: 1.15em;
+}
+
+.custom-gift-grid__option-label {
+  display: block;
+
+  margin-bottom: 0.5em;
+
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+/* Segmented control: one bordered box, values divided by hairlines,
+   the selected value marked by a heavy bar on its leading edge. */
+.custom-gift-grid__swatches {
+  display: flex;
+
+  border: 1px solid var(--cgg-line);
+}
+
+.custom-gift-grid__swatch {
+  flex: 1 1 0;
+  min-width: 0;
+
+  padding: 0.75em 0.5em;
+
+  border: 0;
+  border-left: 0.29em solid transparent;
+
+  background: none;
+  color: inherit;
+
+  font-family: inherit;
+  font-size: 1.15em;
+  line-height: 1.2;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: border-color var(--cgg-duration) var(--cgg-ease);
+}
+
+.custom-gift-grid__swatch + .custom-gift-grid__swatch {
+  box-shadow: inset 1px 0 0 var(--cgg-line);
+}
+
+.custom-gift-grid__swatch[aria-checked="true"] {
+  border-left-color: var(--cgg-ink);
+}
+
+.custom-gift-grid__swatch:focus-visible {
+  outline: 2px solid var(--cgg-ink);
+  outline-offset: -2px;
+}
+
+/* Unavailable combinations stay selectable -- picking one is how you
+   find out it is sold out -- but they are marked. */
+.custom-gift-grid__swatch[data-cgg-unavailable="true"] {
+  color: rgba(0, 0, 0, 0.4);
+  text-decoration: line-through;
+}
+
+/* Dropdown: the chevron sits in its own celled box on the trailing
+   edge, so the native select is stripped and re-drawn. */
+.custom-gift-grid__select-wrap {
+  position: relative;
+
+  display: flex;
+  align-items: stretch;
+
+  border: 1px solid var(--cgg-line);
+}
+
+.custom-gift-grid__select {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  padding: 0.75em 0.5em;
+
+  border: 0;
+  border-right: 1px solid var(--cgg-line);
+
+  background: none;
+  color: inherit;
+
+  font-family: inherit;
+  font-size: 1.15em;
+  line-height: 1.2;
+  text-align: center;
+  text-align-last: center;
+
+  appearance: none;
+  cursor: pointer;
+}
+
+.custom-gift-grid__select:focus-visible {
+  outline: 2px solid var(--cgg-ink);
+  outline-offset: -2px;
+}
+
+.custom-gift-grid__select-chevron {
+  flex: 0 0 auto;
+  align-self: center;
+
+  width: 1em;
+  height: auto;
+  margin: 0 1.35em;
+
+  pointer-events: none;
+}
+
+/* --- Add to cart ---------------------------------------- */
+
+.custom-gift-grid__atc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75em;
+
+  width: 100%;
+  min-height: 3.14em;
+  margin-top: 2.6em;
+  padding: 0.75em 1.2em;
+
+  border: 0;
+
+  background-color: var(--cgg-ink);
+  color: var(--cgg-surface);
+
+  font-family: inherit;
+  font-size: 1.15em;
+  font-weight: 400;
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition: opacity var(--cgg-duration) var(--cgg-ease);
+}
+
+.custom-gift-grid__atc:hover {
+  opacity: 0.85;
+}
+
+.custom-gift-grid__atc:focus-visible {
+  outline: 2px solid var(--cgg-ink);
+  outline-offset: 2px;
+}
+
+.custom-gift-grid__atc[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.custom-gift-grid__atc-icon {
+  flex: 0 0 auto;
+
+  width: 1.625em;
+  height: auto;
+}
+
+.custom-gift-grid__status {
+  margin: 0.9em 0 0;
+
+  font-size: 0.92em;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.custom-gift-grid__status:empty {
+  display: none;
+}
+
+.custom-gift-grid__status[data-state="error"] {
+  color: #b3261e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-gift-grid__dialog[open],
+  .custom-gift-grid__dialog[open]::backdrop {
+    animation-duration: 1ms;
+  }
+
+  .custom-gift-grid__swatch,
+  .custom-gift-grid__atc {
+    transition-duration: 1ms;
+  }
+}
